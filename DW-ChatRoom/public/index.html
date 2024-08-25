@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Darkweb Chat Room</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="user-list" id="serverMessage">
+            <h3>USERS - online</h3>
+           
+        </div>
+        <div class="chat-window">
+            <div class="chat-box" >
+                <div class="message" id="messages">
+                    </div>
+
+                <!-- Add more messages as needed -->
+            </div>
+            <div class="chat-input">
+                <input type="text" placeholder="Type a message..." id="message">
+                <button id="sendBtn">Send</button>
+            </div>
+        </div>
+    </div>
+    <script src = "/socket.io/socket.io.js"></script>
+    <script>
+
+        const name = prompt("Enter a username to join the chat");
+
+        const socket = io();
+        const messageInput = document.getElementById("message");
+        const sendBtn = document.getElementById("sendBtn");
+        const allMessages = document.getElementById("messages");
+        const serverMessage = document.getElementById("serverMessage");
+        
+        
+        
+        socket.on("message" , (message) =>{
+            console.log(message);
+            const p = document.createElement("p");
+            p.innerText = `${message.name}: ${message.message}`;
+            allMessages.appendChild(p); 
+        }); 
+        
+        socket.on("user-joined" ,(name) =>{
+            const h4 = document.createElement("h4");
+            h4.innerText = `${name} joined the chat` ;
+            serverMessage.appendChild(h4);
+        });
+        socket.on("left" ,(name) =>{
+            const h4 = document.createElement("h4");
+            h4.innerText = `${name} left the chat` ;
+            serverMessage.appendChild(h4);
+        });
+
+        
+
+        socket.emit("user-joined" , name);
+        
+        
+    
+        
+        
+        sendBtn.addEventListener("click" , e =>{
+            const message = messageInput.value;
+            console.log(message);
+            socket.emit("userMessage" , message);
+            document.getElementById("message").value = "";
+            document.getElementById("message").focus();
+
+            
+        });
+
+        
+       
+
+    </script>
+</body>
+</html>
